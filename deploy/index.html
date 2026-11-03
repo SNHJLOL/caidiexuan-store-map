@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>采蝶轩门店分布</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cg%20transform%3D%22translate(16%2016)%20scale(1.13)%20translate(-16%20-16)%22%3E%3Cpath%20d%3D%22M9.4%2016h13.2l-2%2010.9a2.3%202.3%200%200%201-2.3%201.8h-4.6a2.3%202.3%200%200%201-2.3-1.8z%22%20fill%3D%22%23B7242C%22%2F%3E%3Cpath%20d%3D%22M7.6%2016.2c0-4.9%203.7-7.9%208.4-7.9s8.4%203%208.4%207.9z%22%20fill%3D%22%23F2DDBB%22%2F%3E%3Cpath%20d%3D%22M9%2015.9c0-4.1%203.1-6.6%207-6.6s7%202.5%207%206.6z%22%20fill%3D%22%23FCF2E2%22%2F%3E%3Ccircle%20cx%3D%2216%22%20cy%3D%227.6%22%20r%3D%222.5%22%20fill%3D%22%23E5443F%22%2F%3E%3Ccircle%20cx%3D%2215.2%22%20cy%3D%226.8%22%20r%3D%22.75%22%20fill%3D%22%23ffffff%22%20opacity%3D%22.6%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+<script>
+  // 首屏前定主题，避免闪白
+  (function () {
+    try {
+      var t = localStorage.getItem('cdx-theme');
+      if (!t) t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      document.documentElement.dataset.theme = t;
+    } catch (e) {}
+  })();
+</script>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    color:#2A2320;background:#FBF8F3}
+  .app{display:flex;height:100vh;height:100dvh}
+
+  /* ---------- 左侧面板 ---------- */
+  aside{width:392px;flex:0 0 392px;display:flex;flex-direction:column;
+    background:#FFFDFA;border-right:1px solid #EDE4D9;z-index:2}
+  .brand{padding:22px 22px 14px}
+  .brand h1{margin:0;font-size:19px;letter-spacing:.5px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .brand h1 .dot{width:9px;height:9px;border-radius:50%;background:#B7242C;box-shadow:0 0 0 3px rgba(183,36,44,.12)}
+  .brand p{margin:7px 0 0;font-size:12px;color:#9A8D84;line-height:1.6}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#EDE4D9;
+    border-top:1px solid #EDE4D9;border-bottom:1px solid #EDE4D9;margin-top:16px}
+  .stat{background:#FFFDFA;padding:12px 8px;text-align:center}
+  .stat b{display:block;font-size:21px;font-weight:700;letter-spacing:-.5px;color:#B7242C;font-variant-numeric:tabular-nums}
+  .stat span{font-size:11px;color:#9A8D84}
+
+  .filters{padding:13px 22px 12px;border-bottom:1px solid #F2EAE0}
+  .modes{display:flex;gap:2px;background:#F5EEE5;border-radius:9px;padding:3px;margin-bottom:11px}
+  .modes button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;color:#7A6E66;
+    padding:6px 4px;border-radius:7px;cursor:pointer;transition:.16s;white-space:nowrap}
+  .modes button:hover{color:#2A2320}
+  .modes button.on{background:#fff;color:#B7242C;font-weight:600;box-shadow:0 1px 3px rgba(90,60,40,.10)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chips.dchips{margin-top:8px;flex-wrap:wrap;border-top:1px dashed #EEE3D7;padding-top:9px}
+  .chips.dchips .chip.all-mark{background:#F7F1E9;border-color:#E6DCD0}
+  .chips.dchips .chip{font-size:11.5px;padding:4px 8px;gap:4px}
+  .chips.dchips .chip .n{font-size:10px}
+  .chip{border:1px solid #E6DCD0;background:#fff;color:#5C524B;font-size:12px;
+    padding:5px 10px;border-radius:999px;cursor:pointer;transition:.16s;display:flex;align-items:center;gap:5px}
+  .chip:hover{border-color:#CFC1B2}
+  .chip .n{font-size:11px;color:#A99C92;font-variant-numeric:tabular-nums}
+  .chip.on{background:#B7242C;border-color:#B7242C;color:#fff}
+  .chip.on .n{color:rgba(255,255,255,.72)}
+  .chip i{width:6px;height:6px;border-radius:50%;display:inline-block}
+
+  .search{margin-top:11px;position:relative}
+  .search input{width:100%;height:34px;border:1px solid #E6DCD0;border-radius:9px;
+    padding:0 32px 0 11px;font-size:12.5px;background:#fff;color:#2A2320;outline:none;transition:.16s}
+  .search input:focus{border-color:#B7242C;box-shadow:0 0 0 3px rgba(183,36,44,.07)}
+  .search .x{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:15px;
+    color:#BEB0A4;cursor:pointer;line-height:1;display:none}
+
+  .list{flex:1;overflow-y:auto;overflow-x:hidden;padding:6px 10px 24px}
+  .list::-webkit-scrollbar{width:6px}
+  .list::-webkit-scrollbar-thumb{background:#E2D6C8;border-radius:3px}
+  .item{padding:11px 12px;border-radius:10px;cursor:pointer;transition:.14s;border:1px solid transparent}
+  .item:hover{background:#F8F2EA}
+  .item.on{background:#FDF1F0;border-color:#F2D3D0}
+  .item .row1{display:flex;align-items:baseline;gap:7px}
+  .item .nm{font-size:13.5px;font-weight:600;letter-spacing:.2px}
+  .item .cd{font-size:10.5px;color:#B5A79C;font-variant-numeric:tabular-nums;margin-left:auto}
+  .item .ad{font-size:11.5px;color:#8B7F76;margin-top:4px;line-height:1.55;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .item .mt{font-size:11px;color:#B0A398;margin-top:5px;display:flex;gap:11px}
+  .item .city{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;color:#fff;flex:0 0 auto;
+    max-width:86px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+  .empty{padding:36px 16px;text-align:center;color:#B0A398;font-size:12.5px}
+
+    .switch{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:#5C524B;
+    cursor:pointer;user-select:none;line-height:1}
+  .switch input{position:absolute;opacity:0;pointer-events:none}
+  .switch .track{width:32px;height:18px;border-radius:999px;background:#E6DCD0;position:relative;
+    transition:.18s;flex:0 0 auto}
+  .switch .track::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;transition:.18s;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+  .switch input:checked + .track{background:#B7242C}
+  .switch input:checked + .track::after{transform:translateX(14px)}
+  .switch em{font-style:normal;color:#A99C92;font-size:11px}
+  /* 底图详略切换 */
+  .baserow{display:flex;align-items:center;gap:9px;margin-top:12px}
+  .baserow .bl{font-size:12px;color:#5C524B;flex:0 0 auto;line-height:1}
+  .seg{display:flex;gap:2px;background:#F5EEE5;border-radius:8px;padding:2px;flex:1}
+  .seg button{flex:1;border:0;background:transparent;font:inherit;font-size:11.5px;color:#7A6E66;
+    padding:4px 0;border-radius:6px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .seg button:hover{color:#2A2320}
+  .seg button.on{background:#fff;color:#B7242C;font-weight:600;box-shadow:0 1px 2px rgba(90,60,40,.10)}
+  .ringsum{display:none;margin-top:9px;background:#FDF7F1;border:1px solid #F0E2D4;border-radius:8px;
+    padding:8px 10px;font-size:11px;color:#7A6E66;line-height:1.75}
+  .ringsum b{color:#B7242C;font-weight:600}
+  .ringsum .cf{margin-top:4px;color:#B5A79C;font-size:10.5px}
+
+/* ---------- 地图 ---------- */
+  main{position:relative;flex:1;min-width:0;background:#F2EDE5}
+  #map{position:absolute;inset:0}
+  /* 腾讯地图 2D 视图下旋转控件不可点击，却占据右上角 100x197，隐藏其容器 */
+  #map div:has(> [class*="rotate-"]){display:none!important}
+  /* 底图加载失败兜底：只写浅色一套，深色模式由 #map 的反相滤镜自动得到深底浅字 */
+  .map-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:7px;background:#FBF6EF;color:#6E6058;font-size:12.5px;
+    text-align:center;padding:28px;z-index:6;line-height:1.7}
+  .map-fallback b{font-size:14.5px;color:#2A231E;font-weight:700}
+  .map-fallback .hint{font-size:11.5px;color:#A0938A}
+  .map-tip{position:absolute;left:14px;top:14px;z-index:3;background:rgba(255,253,250,.94);
+    border:1px solid #E9DFD3;border-radius:10px;padding:9px 12px;font-size:11.5px;color:#7A6E66;
+    line-height:1.6;backdrop-filter:blur(8px);max-width:280px}
+  .map-tip b{color:#B7242C;font-weight:600}
+  .legend{position:absolute;right:14px;bottom:14px;z-index:3;background:rgba(255,253,250,.94);
+    border:1px solid #E9DFD3;border-radius:10px;padding:10px 12px;backdrop-filter:blur(8px);
+    max-height:calc(100% - 120px);overflow:auto;max-width:190px}
+  .legend .lg-h{font-size:10.5px;color:#A99C92;letter-spacing:.4px;margin-bottom:5px}
+  .legend .row{display:flex;align-items:center;gap:7px;font-size:11.5px;color:#6E635B;line-height:1.85}
+  .legend .row span{margin-left:auto;color:#B5A79C;font-variant-numeric:tabular-nums}
+  .legend i{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .legend .more{font-size:10.5px;color:#B5A79C;margin-top:4px;line-height:1.5}
+  .legend .bar{width:132px;height:9px;border-radius:5px;margin:6px 0 4px;
+    background:linear-gradient(90deg,#F7E7CE,#F0B357 45%,#DE7A3A 75%,#B7242C)}
+  .legend .bl{display:flex;justify-content:space-between;font-size:10px;color:#A99C92}
+  /* 移动端图例折叠按钮（桌面隐藏，由媒体查询打开） */
+  .legend-btn{display:none;position:absolute;right:10px;bottom:10px;z-index:5;
+    align-items:center;justify-content:center;height:28px;padding:0 11px;border-radius:14px;
+    border:1px solid #E9DFD3;background:rgba(255,253,250,.95);color:#7A6E66;
+    font:inherit;font-size:11.5px;cursor:pointer;backdrop-filter:blur(8px);
+    box-shadow:0 2px 8px rgba(90,60,40,.10)}
+
+  /* 信息窗 */
+  .iw{padding:2px 4px 4px;min-width:186px;color:#2A231E}
+  .iw h4{margin:0 0 6px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;color:#2A231E}
+  .iw .tag{font-size:10px;font-weight:500;color:#fff;padding:1px 6px;border-radius:4px;flex:0 0 auto}
+  .iw p{margin:0;font-size:11.5px;color:#6E6058;line-height:1.65}
+  .iw .kv{margin-top:7px;display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11.5px}
+  .iw .kv b{color:#7C6D62;font-weight:400}
+  .iw .kv span{color:#3A322C;font-variant-numeric:tabular-nums}
+
+  /* ---------- 黑夜模式 ---------- */
+  .brand-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand-top h1{min-width:0}
+  .theme-btn{flex:0 0 auto;width:30px;height:30px;border-radius:9px;
+    border:1px solid #E6DCD0;background:#fff;color:#7A6E66;font-size:14px;line-height:1;
+    cursor:pointer;transition:.16s;display:flex;align-items:center;justify-content:center}
+  .theme-btn:hover{border-color:#CFC1B2;color:#B7242C}
+
+  [data-theme="dark"]{color-scheme:dark}
+  [data-theme="dark"] body{background:#14100D;color:#EDE5DC}
+  [data-theme="dark"] aside{background:#1B1613;border-right-color:#2E2620}
+  [data-theme="dark"] .brand h1{color:#F2EAE1}
+  [data-theme="dark"] .brand p{color:#8E8076}
+  [data-theme="dark"] .theme-btn{background:#241E19;border-color:#332A23;color:#C9BCB0}
+  [data-theme="dark"] .theme-btn:hover{color:#F0919A;border-color:#463A31}
+  [data-theme="dark"] .stats{background:#2E2620;border-color:#2E2620}
+  [data-theme="dark"] .stat{background:#1B1613}
+  [data-theme="dark"] .stat b{color:#E8616A}
+  [data-theme="dark"] .stat span{color:#8E8076}
+  [data-theme="dark"] .filters{border-bottom-color:#252019}
+  [data-theme="dark"] .modes{background:#241E19}
+  [data-theme="dark"] .modes button{color:#9C8F84}
+  [data-theme="dark"] .modes button.on{background:#332A23;color:#F0919A;box-shadow:none}
+  [data-theme="dark"] .chip{background:#241E19;border-color:#332A23;color:#C9BCB0}
+  [data-theme="dark"] .chip .n{color:#7E7268}
+  [data-theme="dark"] .chip:hover{border-color:#463A31}
+  [data-theme="dark"] .chip.on{background:#B7242C;border-color:#B7242C;color:#fff}
+  [data-theme="dark"] .chips.dchips{border-top-color:#2A231D}
+  [data-theme="dark"] .chips.dchips .chip.all-mark{background:#211B17;border-color:#332A23}
+  [data-theme="dark"] .search input{background:#241E19;border-color:#332A23;color:#EDE5DC}
+  [data-theme="dark"] .search input::placeholder{color:#6F645B}
+  [data-theme="dark"] .search input:focus{border-color:#B7242C;box-shadow:0 0 0 3px rgba(183,36,44,.22)}
+  [data-theme="dark"] .search .x{color:#6F645B}
+  [data-theme="dark"] .switch{color:#C9BCB0}
+  [data-theme="dark"] .switch .track{background:#3A3029}
+  [data-theme="dark"] .switch em{color:#7E7268}
+  [data-theme="dark"] .baserow .bl{color:#C9BCB0}
+  [data-theme="dark"] .seg{background:#241E19}
+  [data-theme="dark"] .seg button{color:#9C8F84}
+  [data-theme="dark"] .seg button:hover{color:#EDE5DC}
+  [data-theme="dark"] .seg button.on{background:#332A23;color:#F0919A;box-shadow:none}
+  [data-theme="dark"] .ringsum{background:#221B17;border-color:#332A23;color:#B7A99D}
+  [data-theme="dark"] .ringsum .cf{color:#7A6E64}
+  [data-theme="dark"] .list::-webkit-scrollbar-thumb{background:#3A3029}
+  [data-theme="dark"] .item:hover{background:#221C17}
+  [data-theme="dark"] .item.on{background:#2B1D1C;border-color:#4A2C2A}
+  [data-theme="dark"] .item .nm{color:#F0E8DF}
+  [data-theme="dark"] .item .ad{color:#95877C}
+  [data-theme="dark"] .item .mt{color:#7E7268}
+  [data-theme="dark"] .item .cd{color:#6F645B}
+  [data-theme="dark"] .empty{color:#7E7268}
+  [data-theme="dark"] main{background:#0F0C0A}
+  [data-theme="dark"] .legend,[data-theme="dark"] .map-tip{background:rgba(27,22,19,.94);border-color:#332A23;color:#B7A99D}
+  [data-theme="dark"] .legend .lg-h{color:#7E7268}
+  [data-theme="dark"] .legend .row{color:#B7A99D}
+  [data-theme="dark"] .legend .row span{color:#7E7268}
+  [data-theme="dark"] .legend .more,[data-theme="dark"] .legend .bl{color:#7E7268}
+  [data-theme="dark"] .legend-btn{background:rgba(27,22,19,.95);border-color:#332A23;color:#B7A99D}
+  [data-theme="dark"] .map-tip b{color:#E8616A}
+  /* 底图靠反相近似夜间配色（不使用需白名单的 mapStyleId） */
+  [data-theme="dark"] #map{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(1.14) saturate(.92)}
+  /* 信息窗整块被反相：颜色令牌已按「反转后再看」预设，此处保证文字不继承主题色 */
+  [data-theme="dark"] .iw{color:#2A231E}
+  /* 标记图标是 SVG data URI，被父级反相后会把白字变黑，这里再反相一次还原原色 */
+  [data-theme="dark"] #map img[src^="data:image/svg+xml"]{filter:invert(1) hue-rotate(180deg)}
+
+  @media (max-width:900px){
+    .app{flex-direction:column}
+    aside{width:100%;flex:1 1 auto;min-height:0;order:2;border-right:none;
+      border-top:1px solid #EDE4D9;overflow:hidden}
+    main{order:1;flex:0 0 38vh;min-height:240px}
+
+    /* 顶部信息压缩，把纵向空间让给列表 */
+    .brand{padding:11px 16px 7px}
+    .brand h1{font-size:16px}
+    .theme-btn{width:26px;height:26px;border-radius:8px;font-size:13px}
+    .brand p{display:none}
+    .stats{margin-top:7px}
+    .stat{padding:7px 4px}
+    .stat b{font-size:16px}
+    .stat span{font-size:10px}
+    .filters{padding:9px 16px 10px}
+    .modes{margin-bottom:8px}
+    .modes button{font-size:11.5px;padding:5px 0}
+    .search{margin-top:8px}
+    .search input{height:32px;font-size:12px}
+    .baserow{margin-top:9px}
+    .switch{margin-top:8px}
+
+    /* 筛选条改单行横向滑动，避免换行吃掉整个屏幕（dchips 需单独指定，特异性更高） */
+    .chips{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;padding-bottom:3px;
+      scrollbar-width:none;-webkit-overflow-scrolling:touch}
+    .chips.dchips{flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
+    .chips::-webkit-scrollbar{display:none}
+    .chips .chip{flex:0 0 auto}
+
+    .map-tip{display:none}
+    .legend{display:none;padding:8px 10px;right:10px;bottom:54px;max-width:160px;
+      max-height:calc(100% - 66px);overflow:auto}
+    .legend.open{display:block}
+    .legend-btn{display:flex}
+    .list{padding:4px 10px 28px;min-height:0}
+  }
+</style>
+<script src="https://map.qq.com/api/gljs?v=1.exp&libraries=visualization&key=4NVBZ-GRI6Z-FQXX3-TZM27-SRCG7-HUF3V"></script>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <div class="brand-top">
+        <h1><span class="dot"></span>采蝶轩 · 门店分布</h1>
+        <button class="theme-btn" id="theme" title="切换深色 / 浅色">☾</button>
+      </div>
+      <p>中山市采蝶轩食品有限公司 直营门店<br>数据取自「采蝶轩会员」小程序门店接口</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><b id="s-total">—</b><span>门店总数</span></div>
+      <div class="stat"><b id="s-city">—</b><span>覆盖城市</span></div>
+      <div class="stat"><b id="s-area">—</b><span>区县镇</span></div>
+    </div>
+
+    <div class="filters">
+      <div class="modes" id="modes">
+        <button data-mode="city">按城市</button>
+        <button data-mode="district">按区县</button>
+        <button data-mode="heat">热力图</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="chips dchips" id="dchips" style="display:none"></div>
+      <div class="baserow">
+        <span class="bl">底图</span>
+        <div class="seg" id="base">
+          <button data-b="min">仅路网</button>
+          <button data-b="mid">含路名</button>
+          <button data-b="full">完整</button>
+        </div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="ring">
+        <span class="track"></span>
+        5km 服务圈 <em>看覆盖盲区</em>
+      </label>
+      <div class="ringsum" id="ringsum"></div>
+      <div class="search">
+        <input id="q" type="text" placeholder="搜门店名 / 地址，如「小榄」「大石」">
+        <span class="x" id="qx">×</span>
+      </div>
+    </div>
+
+    <div class="list" id="list"></div>
+  </aside>
+
+  <main>
+    <div id="map"></div>
+    <div class="legend" id="legend"></div>
+    <button class="legend-btn" id="legendBtn" type="button">图例</button>
+    <div class="map-tip" id="tip"></div>
+  </main>
+</div>
+
+<script>
+/* ============ 数据 ============ */
+const STORES = /**/[{"id":50372,"code":"7005","name":"百越店","addr":"广州市番禺区市桥街富华西路15-19号","lng":113.362832,"lat":22.946768,"tel":"020-84664663","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50367,"code":"1221","name":"蔡边店","addr":"广州市番禺区东环市新路205号","lng":113.378308,"lat":22.963629,"tel":"020-84886794","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50375,"code":"7010","name":"朝东店","addr":"广州市番禺区大石街朝阳东路160号采蝶轩","lng":113.316758,"lat":23.026657,"tel":"020-84820964","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50383,"code":"7022","name":"大北店","addr":"番禺区市桥街道大北路292-294号(银苑大厦对面)","lng":113.367028,"lat":22.946645,"tel":"020-84704086","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50373,"code":"7006","name":"大石店","addr":"大石街道朝阳西路102号","lng":113.305839,"lat":23.0233,"tel":"020-85827695","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50369,"code":"7001","name":"东城店","addr":"广州市番禺区市桥街德兴路324号","lng":113.379439,"lat":22.927257,"tel":"020-84632464","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50381,"code":"7019","name":"光明南店","addr":"广州市番禺区市桥街光明南路71号","lng":113.363055,"lat":22.936828,"tel":"020-84830381","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50309,"code":"8023","name":"捷进店","addr":"广州市番禺区市桥街道捷进中路14号之三十四商铺","lng":113.365676,"lat":22.951185,"tel":"18022168155","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50378,"code":"7014","name":"金龙店","addr":"大龙街金龙路桥边街21号、23号商铺","lng":113.434102,"lat":22.956635,"tel":"020-32085394","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50368,"code":"5008","name":"锦绣店","addr":"广州市番禺区钟村街锦绣花园","lng":113.310128,"lat":22.968856,"tel":"020-84043564","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50384,"code":"7030","name":"南村店","addr":"广州市番禺区南村综合市场65号采蝶轩","lng":113.389482,"lat":23.006652,"tel":"020-31041913","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50379,"code":"7016","name":"平康店","addr":"广州市番禺区市桥街平康路28号","lng":113.371414,"lat":22.940496,"tel":"020-84635430","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50386,"code":"7035","name":"桥南店","addr":"广州市番禺区桥南街桥南路53号","lng":113.368543,"lat":22.927267,"tel":"020-31075902","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50385,"code":"7034","name":"清河店","addr":"广州市番禺区大龙街亚运大道234号","lng":113.397066,"lat":22.935712,"tel":"020-31560739","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50376,"code":"7011","name":"沙头店","addr":"广州市番禺区沙头街捷进西路56号","lng":113.349944,"lat":22.945398,"tel":"020-34517817","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50380,"code":"7018","name":"沙湾店","addr":"广州市番禺区沙湾镇中华大道36、38号","lng":113.338727,"lat":22.901144,"tel":"020-31149825","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50382,"code":"7021","name":"上漖店","addr":"广州市番禺区洛浦街道沙滘西路43号1栋101","lng":113.312805,"lat":23.039801,"tel":"020-85829524","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50377,"code":"7012","name":"石岗店","addr":"广州市番禺区大龙街市莲路石岗东村15号","lng":113.397533,"lat":22.940155,"tel":"020-34617461","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50371,"code":"7004","name":"石基店","addr":"广州市番禺区石基镇岐山中路77、79号","lng":113.439103,"lat":22.956482,"tel":"020-39960101","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50374,"code":"7007","name":"石楼店","addr":"广州市番禺区石楼镇人民路石一村商业楼10号","lng":113.485758,"lat":22.972735,"tel":"020-84656518","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50370,"code":"7002","name":"西丽店","addr":"广州市番禺区市桥街西丽南路134号","lng":113.354067,"lat":22.93559,"tel":"18925399213","open":"09:00-20:30","city":"广州市","district":"番禺区"},{"id":50389,"code":"8006","name":"谢村店","addr":"广州市番禺区钟村街谢村","lng":113.314866,"lat":22.981791,"tel":"020-84884676","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50387,"code":"7036","name":"钟村店","addr":"广州市番禺区钟村街云市西路1号","lng":113.315837,"lat":22.97461,"tel":"020-39184840","open":"07:30-20:30","city":"广州市","district":"番禺区"},{"id":50321,"code":"7015","name":"大岗店","addr":"广州市南沙区大岗镇兴业路76号","lng":113.403283,"lat":22.79797,"tel":"020-34980523","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50324,"code":"7027","name":"黄阁店","addr":"广州市南沙区黄阁镇黄梅路30号首层之三商铺","lng":113.507684,"lat":22.824796,"tel":"020-84973969","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50325,"code":"7028","name":"江南店","addr":"广州市南沙区南沙街江南路117号","lng":113.575783,"lat":22.745685,"tel":"020-39035322","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50322,"code":"7017","name":"解放店","addr":"广州市南沙区大岗镇解放路108号","lng":113.411692,"lat":22.804138,"tel":"020-34933210","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50329,"code":"7038","name":"金洲店","addr":"广州市南沙区裕兴花园金洲商业大厦","lng":113.547767,"lat":22.802091,"tel":"020-34684993","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50327,"code":"7031","name":"榄核店","addr":"广州市南沙区榄核镇镇南路50号","lng":113.370028,"lat":22.836413,"tel":"020-39011176","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50323,"code":"7023","name":"潭洲店","addr":"广州市南沙区大岗镇欣荣路87号","lng":113.388817,"lat":22.783813,"tel":"020-39009565","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50326,"code":"7029","name":"万顷沙店","addr":"广州市南沙区珠江二路28号","lng":113.547017,"lat":22.702168,"tel":"020-84969840","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50328,"code":"7032","name":"鱼窝头店","addr":"鱼窝头真富裕路同华街11号(近中国联通)","lng":113.458242,"lat":22.851368,"tel":"020-39133646","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50312,"code":"1222","name":"珠江店","addr":"广州市南沙区珠江街珠江东路106号","lng":113.546145,"lat":22.704058,"tel":"020-84940076","open":"07:30-20:30","city":"广州市","district":"南沙区"},{"id":50244,"code":"8016","name":"白蕉店","addr":"珠海市斗门区白蕉镇桥湖北路","lng":113.307366,"lat":22.213834,"tel":"0756-8866516","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50284,"code":"4008","name":"白藤店","addr":"珠海市斗门区白藤二路8号124号","lng":113.362873,"lat":22.152556,"tel":"0756-5525215","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50231,"code":"6012","name":"步行街店","addr":"斗门区井岸镇新民路190、192号采蝶轩","lng":113.295164,"lat":22.209669,"tel":"0756-5533553","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50236,"code":"6030","name":"斗门大信店","addr":"珠海市斗门区井岸镇中兴中路328号采蝶轩","lng":113.297622,"lat":22.214657,"tel":"0756-6902128","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":59369,"code":"1224","name":"斗门店","addr":"珠海市斗门区斗门镇兴门路17、19号商铺","lng":113.19692,"lat":22.234056,"tel":"0756-5666801","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50235,"code":"6026","name":"红旗店","addr":"珠海市斗门区白藤农场大新商业街采蝶轩","lng":113.343793,"lat":22.138857,"tel":"0756-5209718","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50316,"code":"2020","name":"虹桥店","addr":"珠海市斗门区白蕉镇虹桥三路3号商业5区16、17号商铺","lng":113.334149,"lat":22.201406,"tel":"0756-5666906","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50229,"code":"6009","name":"井岸店","addr":"斗门区井岸镇江湾二路198号","lng":113.299613,"lat":22.199096,"tel":"0756-5152556","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50232,"code":"6019","name":"井湾店","addr":"斗门区井岸镇井湾路197号","lng":113.298862,"lat":22.195875,"tel":"0756-5528933","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50307,"code":"8021","name":"乾务","addr":"珠海市斗门区乾务镇永昌市场","lng":113.227909,"lat":22.158482,"tel":"18925399186","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50234,"code":"6025","name":"新堂店","addr":"斗门区井岸镇新堂路168号","lng":113.272055,"lat":22.16964,"tel":"0756-5315596","open":"07:30-20:30","city":"珠海市","district":"斗门区"},{"id":50169,"code":"3018","name":"东咀店","addr":"珠海市金湾区金海花园金茂大厦","lng":113.387981,"lat":22.070153,"tel":"18925399139","open":"07:30-20:30","city":"珠海市","district":"金湾区"},{"id":50233,"code":"6020","name":"三灶店","addr":"珠海市金湾区三灶镇映月新村","lng":113.345673,"lat":22.043822,"tel":"0756-7513138","open":"07:30-20:30","city":"珠海市","district":"金湾区"},{"id":50337,"code":"6010","name":"翠华店","addr":"梅溪所香洲安福街47号","lng":113.527875,"lat":22.268622,"tel":"0756-2172343","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50343,"code":"6028","name":"翠微店","addr":"前山所翠微西路688号","lng":113.517139,"lat":22.254719,"tel":"0756-8118986","open":"09:00-20:30","city":"珠海市","district":"香洲区"},{"id":50333,"code":"6003","name":"丹田店","addr":"珠海市香洲凤凰北路1013号","lng":113.57603,"lat":22.279449,"tel":"0756-2231438","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50531,"code":"9028","name":"吉大店","addr":"珠海市吉大景山路93号","lng":113.575257,"lat":22.248931,"tel":"0756-2288540","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50336,"code":"6008","name":"吉莲店","addr":"珠海市吉莲路58号","lng":113.571209,"lat":22.246484,"tel":"0756-3332231","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50339,"code":"6015","name":"金鼎店","addr":"珠海市金鼎金峰中路196号","lng":113.543782,"lat":22.380687,"tel":"0756-3381080","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":59553,"code":"1225","name":"兰埔店","addr":"珠海市香洲区兰埔路89号之一商铺(兰埔花园)","lng":113.542637,"lat":22.239008,"tel":"0756-8866630","open":"07:00-20:30","city":"珠海市","district":"香洲区"},{"id":50335,"code":"6006","name":"明珠店","addr":"珠海市前山明珠南路3164号","lng":113.519687,"lat":22.260313,"tel":"0756-8588144","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50293,"code":"5012","name":"南屏店","addr":"珠海市香洲区南屏镇环屏路二街8号一楼2号商铺","lng":113.50432,"lat":22.22586,"tel":"0756-2216126","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50330,"code":"1214","name":"前山店","addr":"珠海市香洲区前山路72号","lng":113.529518,"lat":22.243823,"tel":"18924931840","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50338,"code":"6014","name":"山场店","addr":"珠海市香洲区山场路48、50号商铺","lng":113.554532,"lat":22.279819,"tel":"18925398759","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50332,"code":"6001","name":"唐家湾店","addr":"珠海市高新区山房路81号","lng":113.595483,"lat":22.358705,"tel":"0756-3388849","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50341,"code":"6017","name":"夏湾店","addr":"珠海市香洲区拱北昌平路205号","lng":113.539062,"lat":22.222363,"tel":"0756-8891498","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50340,"code":"6016","name":"香洲店","addr":"珠海市香洲人民东路285号","lng":113.554042,"lat":22.270447,"tel":"0756-2278148","open":"07:30-20:30","city":"珠海市","district":"香洲区"},{"id":50403,"code":"9027","name":"百花店","addr":"祖庙街道光华街14号首层之一（1）号铺之1＃","lng":113.112313,"lat":23.02683,"tel":"18022168017","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50393,"code":"7003","name":"东方店","addr":"佛山市禅城区东方广场明珠城首层","lng":113.12416,"lat":23.036875,"tel":"0757-82324980","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50398,"code":"7033","name":"华强店","addr":"佛山市禅城区祖庙高基街164号","lng":113.112268,"lat":23.040052,"tel":"0757-82069287","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50212,"code":"3012","name":"华远店","addr":"石湾镇街道华远东路13号第一层(1字楼) 33、34、38号铺位","lng":113.117381,"lat":23.009006,"tel":"19129168394","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50274,"code":"1205","name":"锦园店","addr":"佛山市禅城区张槎四路72、74、76号","lng":113.099859,"lat":23.035201,"tel":"18022168157","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50388,"code":"7039","name":"前进店","addr":"石湾镇街道前进路9号采蝶轩","lng":113.103441,"lat":22.981445,"tel":"020-39299389","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50407,"code":"1212","name":"卫国店","addr":"佛山市禅城区祖庙卫国路5号","lng":113.119961,"lat":23.023964,"tel":"18022175030","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50396,"code":"7025","name":"兆阳店","addr":"佛山市禅城区石湾镇华远东路65号","lng":113.117076,"lat":22.999542,"tel":"0757-83906712","open":"07:30-20:30","city":"佛山市","district":"禅城区"},{"id":50391,"code":"1215","name":"大沥店","addr":"佛山市南海区大沥镇环镇路","lng":113.120913,"lat":23.11487,"tel":"0757-85508926","open":"07:30-20:30","city":"佛山市","district":"南海区"},{"id":50404,"code":"9030","name":"东二店","addr":"佛山市南海区桂城东二大道“联益坊”综合楼","lng":113.150124,"lat":23.027944,"tel":"18022178207","open":"07:30-20:30","city":"佛山市","district":"南海区"},{"id":50392,"code":"6027","name":"海四店","addr":"佛山市南海区桂城海四路富泽商业城","lng":113.135448,"lat":23.051547,"tel":"0757-86327319","open":"07:30-20:30","city":"佛山市","district":"南海区"},{"id":50224,"code":"9006","name":"黄岐店","addr":"佛山市南海区大沥镇黄岐岐西路20号铺","lng":113.189643,"lat":23.112285,"tel":"18925399283","open":"07:30-20:30","city":"佛山市","district":"南海区"},{"id":50394,"code":"7008","name":"佳盛店","addr":"佛山市南海区桂城华翠南路6号佳盛广场首层","lng":113.165366,"lat":23.032663,"tel":"0757-81068980","open":"09:00-20:30","city":"佛山市","district":"南海区"},{"id":50405,"code":"9031","name":"景裕店","addr":"佛山市南海区桂城南一路宏宇景裕豪园首层","lng":113.137668,"lat":23.06546,"tel":"0757-81068180","open":"07:30-20:30","city":"佛山市","district":"南海区"},{"id":50390,"code":"1209","name":"石肯店","addr":"佛山市南海区桂城石肯圩镇路升联综合楼","lng":113.161074,"lat":23.008791,"tel":"0757-81018498","open":"07:30-20:30","city":"佛山市","district":"南海区"},{"id":50400,"code":"9015","name":"北教店","addr":"佛山市顺德区北滘镇跃进北路天福苑","lng":113.204153,"lat":22.932503,"tel":"0757-26638548","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50402,"code":"9025","name":"碧江店","addr":"佛山市顺德区北滘镇碧江万象时尚广场首层","lng":113.259008,"lat":22.939935,"tel":"0757-29892779","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50205,"code":"1207","name":"扁教店","addr":"佛山市顺德区容桂兴华东路24号","lng":113.315001,"lat":22.747416,"tel":"0757-26610029","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50220,"code":"9001","name":"朝阳店","addr":"佛山市顺德区容桂北潮直街207号采蝶轩","lng":113.275518,"lat":22.770815,"tel":"0757-28310291","open":"09:00-20:30","city":"佛山市","district":"顺德区"},{"id":50399,"code":"7037","name":"陈村店","addr":"佛山市顺德区陈村镇合成路","lng":113.230344,"lat":22.958873,"tel":"0757-23314116","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50354,"code":"9007","name":"大良店","addr":"佛山市顺德区大良清晖路68号","lng":113.255832,"lat":22.832232,"tel":"0757-22634088","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50924,"code":"2019","name":"德华店","addr":"乐从镇乐从居委会德华路A158号盈翠园A区商铺A29号","lng":113.098103,"lat":22.957415,"tel":"19129168384","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50230,"code":"6011","name":"德龙店","addr":"容桂街道海尾社区文海中路12号三栋(德龙智造科技园综合楼)","lng":113.28696,"lat":22.744775,"tel":"18925399232","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50530,"code":"6018","name":"东乐店","addr":"佛山市顺德区大良东乐路3号","lng":113.258592,"lat":22.835186,"tel":"0757-22230045","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50222,"code":"9003","name":"福基店","addr":"佛山市顺德区容桂福基路43号","lng":113.256477,"lat":22.765894,"tel":"0757-28988855","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50228,"code":"9032","name":"富华店","addr":"佛山市顺德区容桂富华路192-200号采蝶轩","lng":113.282217,"lat":22.762221,"tel":"0757-22901302","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50225,"code":"9009","name":"桂洲店","addr":"佛山市顺德区容桂路心西街2号采蝶轩","lng":113.257903,"lat":22.759353,"tel":"0757-26622237","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50363,"code":"9020","name":"恒安店","addr":"均安镇均安社区居民委员会恒安路24号景汇名都商铺193","lng":113.145143,"lat":22.711885,"tel":"18925399183","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50218,"code":"8027","name":"华口店","addr":"佛山市顺德区容桂华新路51号采蝶轩","lng":113.337028,"lat":22.756976,"tel":"0757-23616903","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50349,"code":"1202","name":"华普店","addr":"佛山市顺德区伦教振兴路36号","lng":113.211822,"lat":22.876173,"tel":"0757-27720849","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50348,"code":"1201","name":"金瑞店","addr":"佛山市顺德区乐从镇金瑞1路3号","lng":113.084679,"lat":22.947072,"tel":"0757-28786131","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50360,"code":"9014","name":"锦龙店","addr":"佛山市顺德区大良锦龙大道154号","lng":113.24435,"lat":22.84627,"tel":"0757-22266135","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50350,"code":"6005","name":"近良店","addr":"佛山市顺德区大良南屏路2号","lng":113.270366,"lat":22.820754,"tel":"0757-22220425","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50366,"code":"9033","name":"均安店","addr":"佛山市顺德区均安镇华安路1号","lng":113.157697,"lat":22.706571,"tel":"0757-25511826","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50364,"code":"9023","name":"乐从店","addr":"乐从镇乐从居委会荔南路1号首层之二、三","lng":113.086089,"lat":22.957434,"tel":"0757-28788469","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50355,"code":"9008","name":"勒流店","addr":"佛山市顺德区勒流银城路1号","lng":113.133886,"lat":22.858578,"tel":"0757-25555450","open":"09:00-20:30","city":"佛山市","district":"顺德区"},{"id":50362,"code":"9019","name":"龙江店","addr":"佛山市顺德区龙江镇丰华北路10号","lng":113.075575,"lat":22.884429,"tel":"0757-29223508","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50351,"code":"6013","name":"龙山店","addr":"佛山市顺德区龙江镇涌尾街1号","lng":113.030306,"lat":22.854417,"tel":"0757-23380847","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50352,"code":"7009","name":"伦教店","addr":"佛山市顺德区伦教新成路9号","lng":113.21132,"lat":22.869314,"tel":"0757-27888062","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50221,"code":"9002","name":"南环店","addr":"顺德区容桂街道卫红社区容桂大道北南康楼108号铺位之二","lng":113.26837,"lat":22.773588,"tel":"0757-22902080","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50401,"code":"9022","name":"蓬莱店","addr":"佛山市顺德区蓬莱新村西区东南门旁","lng":113.208118,"lat":22.918733,"tel":"0757-26666568","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50223,"code":"9004","name":"青华店","addr":"佛山市顺德区容桂青华路201号","lng":113.271256,"lat":22.767713,"tel":"0757-28307170","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50219,"code":"8028","name":"容里店","addr":"佛山市顺德区容桂骏晖路3号","lng":113.295341,"lat":22.766573,"tel":"0757-22909273","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50226,"code":"9017","name":"上佳市店","addr":"佛山市顺德区容桂新有西路4号","lng":113.286833,"lat":22.761601,"tel":"0757-22903448","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50359,"code":"9013","name":"石洛店","addr":"佛山市顺德区大良红岗石洛路红岗楼11号","lng":113.253639,"lat":22.828138,"tel":"0757-22617101","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50365,"code":"9026","name":"天福源店","addr":"佛山市顺德区均安镇建安路88号首层","lng":113.154919,"lat":22.705135,"tel":"0757-25577488","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50227,"code":"9024","name":"小黄圃店","addr":"佛山市顺德区容桂联群路1号","lng":113.311981,"lat":22.778678,"tel":"0757-22907337","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50353,"code":"7013","name":"新丰店","addr":"佛山市顺德区伦教新丰路48号","lng":113.215313,"lat":22.870934,"tel":"0757-29832585","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50358,"code":"9012","name":"新基店","addr":"佛山市顺德区大良新基二路9号","lng":113.250422,"lat":22.847672,"tel":"0757-22335830","open":"09:00-20:30","city":"佛山市","district":"顺德区"},{"id":50361,"code":"9018","name":"杏坛店","addr":"佛山市顺德区杏坛镇河北六路南8号","lng":113.159783,"lat":22.785549,"tel":"0757-22896078","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50356,"code":"9010","name":"盈信店","addr":"佛山市顺德区龙江镇文华路11号","lng":113.077097,"lat":22.871332,"tel":"0757-29290226","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50357,"code":"9011","name":"云良店","addr":"佛山市顺德区大良云良路8号","lng":113.259636,"lat":22.841993,"tel":"0757-22306078","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50166,"code":"3009","name":"展业店","addr":"佛山市顺德区容桂街道细滘社区自然新村展业路 6-B号首层之五采蝶轩","lng":113.257401,"lat":22.765793,"tel":"0757-28818273","open":"07:30-20:30","city":"佛山市","district":"顺德区"},{"id":50295,"code":"5020","name":"沙坪店","addr":"鹤山市县沙坪镇中山路86号","lng":112.961297,"lat":22.767228,"tel":"0750-8889890","open":"07:30-20:30","city":"江门市","district":"鹤山市"},{"id":50301,"code":"8008","name":"祥润店","addr":"鹤山市沙坪水围村水围市场采蝶轩","lng":112.969557,"lat":22.775493,"tel":"0750-8899812","open":"07:30-20:30","city":"江门市","district":"鹤山市"},{"id":50310,"code":"9005","name":"新天地店","addr":"鹤山市沙坪永安路41号","lng":112.960028,"lat":22.763421,"tel":"0750-8916996","open":"07:30-20:30","city":"江门市","district":"鹤山市"},{"id":50296,"code":"5021","name":"新业店","addr":"鹤山市沙坪镇新业路229号采蝶轩","lng":112.969557,"lat":22.775493,"tel":"0750-8995993","open":"07:30-20:30","city":"江门市","district":"鹤山市"},{"id":50825,"code":"8026","name":"敬和店","addr":"礼乐敬和月塘里275号采蝶轩","lng":113.087116,"lat":22.531431,"tel":"0750-3313580","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50187,"code":"3026","name":"康城店","addr":"江门市江海区康城广场1幢105、106室商铺","lng":113.105254,"lat":22.559952,"tel":"0750-3361175","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50297,"code":"5022","name":"礼乐店","addr":"江门市江海区文昌花园文豪小区","lng":113.082359,"lat":22.558094,"tel":"0750-3911582","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50180,"code":"5018","name":"麻园店","addr":"江门市江海区外海街道东环路1号铺之一","lng":113.120937,"lat":22.572057,"tel":"0750-3334581","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50173,"code":"5002","name":"外海店","addr":"江门市外海中华大道如意楼第五六号铺首二层","lng":113.149044,"lat":22.595676,"tel":"0750-3783473","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50181,"code":"5025","name":"杏林店","addr":"江门市江海区外海杏林路4号","lng":113.150251,"lat":22.592208,"tel":"0750-3233862","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50178,"code":"5015","name":"中环店","addr":"江门市江海区东海路48号","lng":113.103579,"lat":22.567949,"tel":"0750-3822858","open":"07:30-20:30","city":"江门市","district":"江海区"},{"id":50291,"code":"5007","name":"白沙店","addr":"江门市蓬江区永康二街17号","lng":113.078353,"lat":22.570049,"tel":"0750-3533086","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50292,"code":"5011","name":"北郊店","addr":"江门市蓬江区建设二路2号","lng":113.078553,"lat":22.593889,"tel":"0750-3233850","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50182,"code":"5026","name":"潮连店","addr":"江门市蓬江区潮连镇青年路95号采蝶轩","lng":113.123357,"lat":22.625995,"tel":"0750-3335191","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50177,"code":"5014","name":"东华店","addr":"江门市东华一路44号采蝶轩","lng":113.098154,"lat":22.594974,"tel":"0750-3385828","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50299,"code":"5024","name":"杜阮店","addr":"江门市蓬江区杜阮镇田东路","lng":113.01652,"lat":22.603114,"tel":"0750-3663236","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50288,"code":"1217","name":"贯溪店","addr":"江门市蓬江区杜阮镇江杜东路21号","lng":113.066782,"lat":22.589963,"tel":"0750-3363348","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50179,"code":"5016","name":"荷塘店","addr":"江门市蓬江区荷塘新荷路6号","lng":113.13652,"lat":22.648572,"tel":"0750-3711638","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50174,"code":"5003","name":"江华店","addr":"江门市蓬江区江华一路85号","lng":113.097698,"lat":22.586441,"tel":"0750-3383396","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50175,"code":"5010","name":"良化店","addr":"江门市蓬江区良化新村东77号采蝶轩","lng":113.104007,"lat":22.601926,"tel":"0750-3378698","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50397,"code":"7026","name":"龙福店","addr":"江门市蓬江区龙福路91号采蝶轩","lng":113.066841,"lat":22.589922,"tel":"0750-3933086","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50290,"code":"5004","name":"胜利店","addr":"江门市蓬江区农林东路43号","lng":113.082272,"lat":22.584317,"tel":"0750-3320698","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50298,"code":"5023","name":"棠下店","addr":"江门市蓬江区棠下镇兴隆路2号","lng":113.03732,"lat":22.680835,"tel":"0750-3902862","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50176,"code":"5013","name":"怡康店","addr":"江门市蓬江区白石大道怡康华庭","lng":113.088556,"lat":22.61119,"tel":"0750-3933845","open":"09:00-20:30","city":"江门市","district":"蓬江区"},{"id":50300,"code":"6022","name":"育德店","addr":"江门市育德街14号","lng":113.089463,"lat":22.608142,"tel":"0750-3101383","open":"07:30-20:30","city":"江门市","district":"蓬江区"},{"id":50294,"code":"5019","name":"大鳌店","addr":"江门市新会区大鳌镇中心一路商业综合楼","lng":113.209519,"lat":22.484466,"tel":"0750-6259569","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50287,"code":"1211","name":"德兴店","addr":"江门市新会区德兴路3-5号","lng":113.040947,"lat":22.53531,"tel":"0750-6123389","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50308,"code":"8022","name":"帝临店","addr":"江门市新会区帝临南路6号","lng":113.037505,"lat":22.509178,"tel":"0750-6329698","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50305,"code":"8018","name":"惠民店","addr":"江门市新会区惠民西路22号","lng":113.033978,"lat":22.524021,"tel":"0750-6639568","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50286,"code":"1208","name":"睦洲店","addr":"江门市新会区睦洲镇长安街59号","lng":113.163313,"lat":22.452618,"tel":"0750-6222389","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50302,"code":"8014","name":"南隅店","addr":"江门市新会区南隅路52号","lng":113.037389,"lat":22.517692,"tel":"0750-6638698","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50306,"code":"8019","name":"侨兴店","addr":"江门市新会区侨兴北路16号","lng":113.049536,"lat":22.526531,"tel":"0750-6783568","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50289,"code":"1219","name":"悦洋店","addr":"江门市新会区侨乐路2号","lng":113.046053,"lat":22.51772,"tel":"0750-6660030","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50303,"code":"8015","name":"知政店","addr":"江门市新会区会城知证南路2号采蝶轩","lng":113.037394,"lat":22.517667,"tel":"0750-6669568","open":"07:30-20:30","city":"江门市","district":"新会区"},{"id":50243,"code":"8013","name":"白溪店","addr":"中山市板芙镇迎宾大道1号","lng":113.336409,"lat":22.394445,"tel":"0760-86501099","open":"07:30-20:30","city":"中山市","district":"板芙镇"},{"id":50238,"code":"8003","name":"板芙店","addr":"中山市板芙镇板芙北路19号","lng":113.321944,"lat":22.417951,"tel":"0760-86505670","open":"07:30-20:30","city":"中山市","district":"板芙镇"},{"id":50189,"code":"4002","name":"大涌店","addr":"中山市大涌镇旗山路采蝶轩","lng":113.285981,"lat":22.468796,"tel":"0760-87733121","open":"07:30-20:30","city":"中山市","district":"大涌镇"},{"id":50197,"code":"4015","name":"岚田店","addr":"中山市大涌镇岚田村东堡","lng":113.279558,"lat":22.468599,"tel":"0760-88880209","open":"07:30-20:30","city":"中山市","district":"大涌镇"},{"id":50211,"code":"3010","name":"东凤店","addr":"中山市东凤镇兴华中路14号(近东凤友谊超级市场)","lng":113.252787,"lat":22.689093,"tel":"0760-22603282","open":"07:30-20:30","city":"中山市","district":"东凤镇"},{"id":50203,"code":"1009","name":"凤安店","addr":"中山市东凤镇凤安路3号","lng":113.251821,"lat":22.704232,"tel":"0760-88728087","open":"07:30-20:30","city":"中山市","district":"东凤镇"},{"id":50260,"code":"1216","name":"帝景东方店","addr":"中山市东区兴文路13号采蝶轩","lng":113.410714,"lat":22.498826,"tel":"0760-88829268","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50250,"code":"1008","name":"库充店","addr":"中山市东区东裕大街22号","lng":113.394701,"lat":22.50802,"tel":"0760-88884413","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50256,"code":"1023","name":"朗晴店","addr":"中山市东区朗晴轩26幢","lng":113.402665,"lat":22.498551,"tel":"0760-85230760","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50269,"code":"1011","name":"岐关西店","addr":"中山市东区岐关西路37号","lng":113.380144,"lat":22.508267,"tel":"0760-88234373","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50273,"code":"1022","name":"起湾店","addr":"中山市东区银湾东路1号","lng":113.400069,"lat":22.531967,"tel":"0760-88232307","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50246,"code":"1004","name":"松苑店","addr":"中山市东区松苑路","lng":113.392517,"lat":22.517024,"tel":"0760-88382479","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50249,"code":"1007","name":"竹苑店","addr":"中山市东区孙文东路465号采蝶轩","lng":113.397719,"lat":22.518854,"tel":"0760-88327025","open":"07:30-20:30","city":"中山市","district":"东区街道"},{"id":50315,"code":"2012","name":"阜沙店","addr":"中山市阜沙镇阜建路1号","lng":113.352754,"lat":22.665863,"tel":"0760-23452397","open":"07:30-20:30","city":"中山市","district":"阜沙镇"},{"id":50280,"code":"2016","name":"二马路店","addr":"中山市港口镇二马路北129号","lng":113.384314,"lat":22.586655,"tel":"0760-88487883","open":"07:30-20:30","city":"中山市","district":"港口镇"},{"id":50268,"code":"1010","name":"幸福店","addr":"中山市港口镇美景西路5号","lng":113.382953,"lat":22.571554,"tel":"0760-88167480","open":"09:00-20:30","city":"中山市","district":"港口镇"},{"id":50168,"code":"3016","name":"曹步店","addr":"中山市古镇曹步曹兴中路79号","lng":113.2016,"lat":22.628458,"tel":"0760-22399783","open":"07:30-20:30","city":"中山市","district":"古镇镇"},{"id":50170,"code":"3024","name":"冈东店","addr":"中山市古镇镇冈东村西洲围大街右二巷4号之二","lng":113.182856,"lat":22.609337,"tel":"0760-88838007","open":"07:30-20:30","city":"中山市","district":"古镇镇"},{"id":50165,"code":"3006","name":"古三店","addr":"中山市古镇镇东兴路129号","lng":113.176062,"lat":22.618057,"tel":"0760-22362239","open":"09:00-20:30","city":"中山市","district":"古镇镇"},{"id":50167,"code":"3014","name":"海洲店","addr":"中山市古镇海洲海兴路采蝶轩","lng":113.186836,"lat":22.617155,"tel":"0760-22312766","open":"07:30-20:30","city":"中山市","district":"古镇镇"},{"id":50172,"code":"3030","name":"新港城店","addr":"中山市古镇镇中兴大道南30号采蝶轩","lng":113.184947,"lat":22.599826,"tel":"0760-88728016","open":"07:30-20:30","city":"中山市","district":"古镇镇"},{"id":50171,"code":"3025","name":"怡庭店","addr":"中山市古镇镇乐怡路15号古一乐丰花园乐丰商业广场首层2-3卡","lng":113.187986,"lat":22.616926,"tel":"0760-88700068","open":"07:30-20:30","city":"中山市","district":"古镇镇"},{"id":50199,"code":"4020","name":"横西店","addr":"中山市横栏镇景帝路8号","lng":113.249161,"lat":22.522661,"tel":"0760-87566228","open":"07:30-20:30","city":"中山市","district":"横栏镇"},{"id":50200,"code":"4021","name":"三沙店","addr":"中山市横栏镇牌坊路2号","lng":113.214842,"lat":22.585114,"tel":"0760-88223669","open":"07:30-20:30","city":"中山市","district":"横栏镇"},{"id":50196,"code":"4013","name":"四沙店","addr":"中山市横栏镇四沙裕祥商业街19号","lng":113.239027,"lat":22.568835,"tel":"0760-87689321","open":"07:30-20:30","city":"中山市","district":"横栏镇"},{"id":50185,"code":"1220","name":"西冲店","addr":"中山市横栏镇西冲中路40号","lng":113.25626,"lat":22.529039,"tel":"0760-88791366","open":"07:30-20:30","city":"中山市","district":"横栏镇"},{"id":50318,"code":"3005","name":"黄圃店","addr":"中山市黄圃镇商业大街2号","lng":113.339391,"lat":22.709419,"tel":"0760-23222646","open":"07:30-20:30","city":"中山市","district":"黄圃镇"},{"id":50242,"code":"8012","name":"蓝天金地店","addr":"中山市黄圃镇新丰北路63号","lng":113.338079,"lat":22.722851,"tel":"0760-85211833","open":"07:30-20:30","city":"中山市","district":"黄圃镇"},{"id":50320,"code":"3017","name":"永安店","addr":"中山市黄圃镇永安路6号","lng":113.340753,"lat":22.715926,"tel":"0760-23210008","open":"07:30-20:30","city":"中山市","district":"黄圃镇"},{"id":50259,"code":"1026","name":"东利店","addr":"中山市开发区东利村","lng":113.52891,"lat":22.565456,"tel":"0760-88728024","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50251,"code":"1012","name":"东镇店","addr":"中山市开发区东镇广场","lng":113.462762,"lat":22.54669,"tel":"0760-85311246","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50252,"code":"1014","name":"濠头店","addr":"中山市开发区濠头大街","lng":113.423952,"lat":22.526181,"tel":"0760-88288278","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50255,"code":"1021","name":"金华店","addr":"中山市中山港大道金华花园","lng":113.457469,"lat":22.535625,"tel":"0760-88710783","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50258,"code":"1025","name":"凯茵店","addr":"中山市开发区凯茵壹加壹一楼采蝶轩","lng":113.456225,"lat":22.505166,"tel":"0760-88789077","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50257,"code":"1024","name":"湾记店","addr":"中山市开发区张家边康怡路16号采蝶轩","lng":113.467467,"lat":22.541513,"tel":"0760-85317003","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50247,"code":"1005","name":"张家边店","addr":"中山市火炬开发区张家边东镇大道15号A03号铺位","lng":113.462874,"lat":22.540504,"tel":"0760-85590454","open":"09:00-20:30","city":"中山市","district":"火炬开发区"},{"id":50261,"code":"1218","name":"中山港店","addr":"中山市中山港大道壹加壹外围采蝶轩","lng":113.462635,"lat":22.558501,"tel":"0760-88286488","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50253,"code":"1016","name":"中心店","addr":"中山市张家边中心市场采蝶轩","lng":113.46643,"lat":22.536464,"tel":"0760-88586280","open":"07:30-20:30","city":"中山市","district":"火炬开发区"},{"id":50314,"code":"2007","name":"民众店","addr":"中山市民众镇六百六路壹加壹商场侧","lng":113.486873,"lat":22.622958,"tel":"0760-85702463","open":"07:30-20:30","city":"中山市","district":"民众街道"},{"id":50317,"code":"2023","name":"文化店","addr":"中山市民众镇文化路47号","lng":113.497709,"lat":22.624513,"tel":"0760-22398741","open":"07:30-20:30","city":"中山市","district":"民众街道"},{"id":50254,"code":"1019","name":"美景店","addr":"中山市南朗镇美景新村1号","lng":113.53177,"lat":22.496278,"tel":"0760-88962330","open":"07:30-20:30","city":"中山市","district":"南朗街道"},{"id":50248,"code":"1006","name":"南朗店","addr":"中山市南朗镇南岐中路48号","lng":113.534311,"lat":22.494997,"tel":"0760-85521225","open":"07:30-20:30","city":"中山市","district":"南朗街道"},{"id":50285,"code":"8007","name":"环城店","addr":"中山市南区城南二路13号","lng":113.356354,"lat":22.486414,"tel":"0760-88898483","open":"07:30-20:30","city":"中山市","district":"南区街道"},{"id":50319,"code":"3008","name":"南头店","addr":"中山市南头镇同乐中路5号","lng":113.289657,"lat":22.712178,"tel":"0760-23119810","open":"07:30-20:30","city":"中山市","district":"南头镇"},{"id":50311,"code":"1206","name":"三角大信店","addr":"中山市三角镇福源南路23号","lng":113.419005,"lat":22.672768,"tel":"0760-88401194","open":"07:30-20:30","city":"中山市","district":"三角镇"},{"id":50313,"code":"2006","name":"三角店","addr":"中山市三角镇福源北路6号","lng":113.418612,"lat":22.680387,"tel":"0760-85402040","open":"07:30-20:30","city":"中山市","district":"三角镇"},{"id":50240,"code":"8009","name":"华丰店","addr":"中山市三乡镇金光大道华丰花园楠苑41号","lng":113.43346,"lat":22.354626,"tel":"0760-86693811","open":"09:00-20:30","city":"中山市","district":"三乡镇"},{"id":50245,"code":"8024","name":"平东店","addr":"中山市三乡镇平东商业大街214、216号","lng":113.433291,"lat":22.334112,"tel":"0760-86336211","open":"07:30-20:30","city":"中山市","district":"三乡镇"},{"id":50237,"code":"8001","name":"三乡店","addr":"中山市三乡镇文昌西路11号首层之5、6号","lng":113.425318,"lat":22.350519,"tel":"0760-86693775","open":"07:30-20:30","city":"中山市","district":"三乡镇"},{"id":50191,"code":"4006","name":"宝珠店","addr":"中山市沙溪镇宝珠西路30号","lng":113.311394,"lat":22.507174,"tel":"0760-87312564","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50198,"code":"4016","name":"岗背店","addr":"中山市沙溪镇康乐南路22号采蝶轩","lng":113.29611,"lat":22.498773,"tel":"0760-88320500","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50184,"code":"1210","name":"豪吐店","addr":"中山市沙溪镇宝珠东路41号","lng":113.330074,"lat":22.509602,"tel":"0760-88836623","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50201,"code":"4022","name":"乐群店","addr":"中山市沙溪镇乐群龙阳路22号","lng":113.316371,"lat":22.52685,"tel":"0760-88799211","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50192,"code":"4007","name":"丽港店","addr":"中山市沙溪镇丽港街53卡","lng":113.302536,"lat":22.511768,"tel":"0760-87333330","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50183,"code":"1204","name":"珑瑞店","addr":"中山市沙溪镇龙瑞朗园街76号","lng":113.341028,"lat":22.511623,"tel":"0760-88728019","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50194,"code":"4011","name":"世纪新城店","addr":"中山市沙溪镇翠景南路18号","lng":113.352457,"lat":22.505845,"tel":"0760-87617272","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50190,"code":"4004","name":"溪角店","addr":"中山市沙溪镇龙瑞村利嘉苑采蝶轩","lng":113.340652,"lat":22.51852,"tel":"0760-87328340","open":"07:30-20:30","city":"中山市","district":"沙溪镇"},{"id":50195,"code":"4012","name":"星宝店","addr":"中山市沙溪镇星宝路3号","lng":113.326701,"lat":22.525614,"tel":"0760-87397661","open":"09:00-20:30","city":"中山市","district":"沙溪镇"},{"id":50239,"code":"8005","name":"神湾店","addr":"中山市神湾镇新城商业街","lng":113.359037,"lat":22.319833,"tel":"0760-86607433","open":"07:30-20:30","city":"中山市","district":"神湾镇"},{"id":50272,"code":"1018","name":"白水井店","addr":"中山市石岐区白水井大街23号","lng":113.376971,"lat":22.516336,"tel":"0760-88849805","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50281,"code":"2017","name":"城南店","addr":"中山市石岐区悦来南路18号","lng":113.368013,"lat":22.50956,"tel":"0760-88923121","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50282,"code":"2018","name":"电子科大店","addr":"中山市石岐区岐头新村龙凤街4号","lng":113.392679,"lat":22.53097,"tel":"0760-23328826","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50276,"code":"2002","name":"东门店","addr":"中山市石岐区孙文中路15号","lng":113.379321,"lat":22.522809,"tel":"0760-88836776","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50283,"code":"2022","name":"海岸店","addr":"中山市石岐街道民富路7号","lng":113.384235,"lat":22.551837,"tel":"18028300090","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50277,"code":"2003","name":"湖滨店","addr":"中山市石岐区湖滨路20号","lng":113.37386,"lat":22.525896,"tel":"0760-88822934","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50278,"code":"2004","name":"湖中店","addr":"中山市石岐区湖滨中路16号","lng":113.377279,"lat":22.533565,"tel":"0760-88700828","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50270,"code":"1013","name":"假日店","addr":"中山市石岐区假日广场首层","lng":113.389797,"lat":22.520643,"tel":"0760-88224338","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50279,"code":"2005","name":"莲兴店","addr":"中山市石岐区莲兴路13号","lng":113.387436,"lat":22.532804,"tel":"0760-88784965","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50267,"code":"1002","name":"名雅店","addr":"中山市石岐区东华路22号","lng":113.392661,"lat":22.540249,"tel":"0760-88223683","open":"09:00-20:30","city":"中山市","district":"石岐街道"},{"id":50271,"code":"1015","name":"永怡店","addr":"中山市石岐区富丽路2号","lng":113.39827,"lat":22.529525,"tel":"0760-88300893","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50186,"code":"2010","name":"悦来店","addr":"中山市石岐区悦来路","lng":113.36993,"lat":22.516655,"tel":"0760-88870783","open":"07:30-20:30","city":"中山市","district":"石岐街道"},{"id":50346,"code":"8011","name":"大兴店","addr":"中山市商业区荣华楼106号铺","lng":113.464292,"lat":22.257272,"tel":"0760-86285680","open":"07:30-20:30","city":"中山市","district":"坦洲镇"},{"id":50347,"code":"8020","name":"金山城店","addr":"中山市坦洲镇金山城","lng":113.494307,"lat":22.269324,"tel":"0760-89989786","open":"07:30-20:30","city":"中山市","district":"坦洲镇"},{"id":50345,"code":"8004","name":"乐怡店","addr":"中山市坦洲镇乐怡路2号","lng":113.466324,"lat":22.278155,"tel":"0760-88833132","open":"07:30-20:30","city":"中山市","district":"坦洲镇"},{"id":50331,"code":"5006","name":"南坦店","addr":"中山市坦洲镇南坦路201号","lng":113.478424,"lat":22.262638,"tel":"0760-86281858","open":"07:30-20:30","city":"中山市","district":"坦洲镇"},{"id":50344,"code":"8002","name":"坦洲店","addr":"中山市坦洲镇坦神北路壹加壹商场内","lng":113.472014,"lat":22.264622,"tel":"0760-86214747","open":"07:30-20:30","city":"中山市","district":"坦洲镇"},{"id":50342,"code":"6023","name":"中澳店","addr":"中山市坦洲镇界狮南路中澳豪逸半岛47卡","lng":113.491567,"lat":22.250965,"tel":"0760-87136992","open":"07:30-20:30","city":"中山市","district":"坦洲镇"},{"id":50241,"code":"8010","name":"长命水店","addr":"中山市五桂山街道长命水康乐街2号首层第7卡","lng":113.41323,"lat":22.482364,"tel":"0760-88202433","open":"07:30-20:30","city":"中山市","district":"五桂山街道"},{"id":50265,"code":"4014","name":"彩虹店","addr":"中山市西区彩虹大道90号","lng":113.342148,"lat":22.556163,"tel":"0760-88550131","open":"07:30-20:30","city":"中山市","district":"西区街道"},{"id":50193,"code":"4009","name":"翠景店","addr":"新居路29号之一翠景市场西48、49卡","lng":113.349712,"lat":22.527828,"tel":"0760-88630078","open":"07:30-20:30","city":"中山市","district":"西区街道"},{"id":50202,"code":"6007","name":"剑桥郡店","addr":"中山市西区剑桥郡4区","lng":113.347542,"lat":22.512163,"tel":"0760-88726928","open":"07:30-20:30","city":"中山市","district":"西区街道"},{"id":50188,"code":"4001","name":"西区店","addr":"中山市西区富华道8号","lng":113.356615,"lat":22.521557,"tel":"0760-88626848","open":"07:30-20:30","city":"中山市","district":"西区街道"},{"id":50216,"code":"3023","name":"宝丰店","addr":"中山市小榄镇宝丰泰宏南路49号","lng":113.255294,"lat":22.590955,"tel":"0760-23320226","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50209,"code":"3003","name":"东堤店","addr":"中山市小榄镇东堤路11号","lng":113.238012,"lat":22.675931,"tel":"0760-22264085","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50263,"code":"4005","name":"东升店","addr":"中山市小榄镇商业大道23号","lng":113.293217,"lat":22.617632,"tel":"0760-22229965","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50217,"code":"3029","name":"广丰店","addr":"中山市小榄镇广丰北路109号","lng":113.220526,"lat":22.629822,"tel":"0760-88839985","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50214,"code":"3020","name":"广源店","addr":"中山市小榄镇广源中路2号","lng":113.24386,"lat":22.668994,"tel":"0760-88785320","open":"09:00-20:30","city":"中山市","district":"小榄镇"},{"id":50208,"code":"3002","name":"红山店","addr":"中山市小榄镇新市红山路63号","lng":113.230282,"lat":22.675914,"tel":"0760-22279565","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50213,"code":"3019","name":"埒西店","addr":"中山市小榄镇盛丰祥丰南路73号","lng":113.249167,"lat":22.623132,"tel":"0760-22276263","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50215,"code":"3021","name":"泰丰店","addr":"中山市小榄镇泰丰综合市场","lng":113.252655,"lat":22.6157,"tel":"0760-22221056","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50266,"code":"4023","name":"坦背店","addr":"中山市小榄镇茵华花园采蝶轩","lng":113.320993,"lat":22.585103,"tel":"0760-88629330","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50262,"code":"3013","name":"同乐店","addr":"中山市东升壹加壹一楼右侧","lng":113.28918,"lat":22.616597,"tel":"0760-22238787","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50207,"code":"1223","name":"文田店","addr":"中山市小榄镇新市文田路8号采蝶轩","lng":113.236481,"lat":22.661782,"tel":"0760-86326689","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50204,"code":"1203","name":"小榄龙山店","addr":"中山市小榄镇龙山路","lng":113.248083,"lat":22.678254,"tel":"0760-22238831","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50264,"code":"4010","name":"新胜店","addr":"中山市东升镇东成路17号一楼3A卡","lng":113.303906,"lat":22.611774,"tel":"0760-22823737","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50210,"code":"3004","name":"新永店","addr":"中山市小榄镇永宁新永路69号","lng":113.231145,"lat":22.665257,"tel":"0760-22273874","open":"07:30-20:30","city":"中山市","district":"小榄镇"},{"id":50206,"code":"1213","name":"永宁店","addr":"中山市小榄镇永宁东宁路299号","lng":113.226745,"lat":22.662517,"tel":"0760-22289915","open":"07:30-20:30","city":"中山市","district":"小榄镇"}]/**/;
+const CITY_COLORS = {
+  '中山市': '#B7242C',
+  '佛山市': '#E07A2E',
+  '广州市': '#2F6F8F',
+  '江门市': '#5E8C61',
+  '珠海市': '#8A6BAF',
+};
+const CITY_ORDER = Object.keys(CITY_COLORS);
+
+/* ============ 区县配色：黄金角散开色相，相邻区县不撞色 ============ */
+const districtKey = (s) => (s.district ? s.city + '/' + s.district : s.city + '/未标注');
+const DISTRICT_COLOR = (() => {
+  const cnt = {};
+  STORES.forEach((s) => { const k = districtKey(s); cnt[k] = (cnt[k] || 0) + 1; });
+  const keys = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a]);
+  const map = {};
+  keys.forEach((k, i) => { map[k] = 'hsl(' + Math.round((i * 137.508) % 360) + ',58%,45%)'; });
+  return map;
+})();
+
+/* ============ 状态 ============ */
+/* 底图详略：features 决定腾讯地图渲染哪些要素，不传 point 即不画商铺 POI */
+const BASE_FEATURES = {
+  min: ['base', 'building2d'],           // 只要路网骨架
+  mid: ['base', 'building2d', 'label'],  // 加道路名，仍不显示商铺 POI
+  full: null,                            // 不传 features = 全部要素
+};
+
+let savedBase = 'mid';
+try { savedBase = localStorage.getItem('cdx-base') || 'mid'; } catch (e) {}
+if (!BASE_FEATURES.hasOwnProperty(savedBase)) savedBase = 'mid';
+
+const state = { city: 'all', district: 'all', q: '', sel: null, zoom: 9, mode: 'city', ring: false, base: savedBase };
+let map, markerLayer, heatLayer, infoWindow, clustered = false, lastRenderZoom = 9;
+
+/* ============ 工具 ============ */
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function match(s) {
+  if (state.city !== 'all' && s.city !== state.city) return false;
+  if (state.mode === 'district' && state.district !== 'all' && s.district !== state.district) return false;
+  if (!state.q) return true;
+  const q = state.q.toLowerCase();
+  return (s.name + s.addr + s.district + s.code).toLowerCase().includes(q);
+}
+const view = () => STORES.filter(match);
+const colorOf = (s) => (state.mode === 'district' ? (DISTRICT_COLOR[districtKey(s)] || '#8A7E77') : CITY_COLORS[s.city]);
+
+/* ============ 统计 ============ */
+function renderStats() {
+  const rows = view();
+  $('#s-total').textContent = rows.length;
+  $('#s-city').textContent = new Set(rows.map((r) => r.city)).size;
+  $('#s-area').textContent = new Set(rows.map((r) => r.city + r.district)).size;
+}
+
+/* ============ 模式切换 ============ */
+function renderModes() {
+  document.querySelectorAll('#modes button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.mode === state.mode);
+    b.onclick = () => {
+      state.mode = b.dataset.mode;
+      renderModes(); renderChips(); renderLegend(); renderTip(); renderMarkers(); renderList(); syncRings(view());
+    };
+  });
+}
+
+/* ============ 城市 / 区县筛选 ============ */
+function renderChips() {
+  const counts = {};
+  STORES.forEach((s) => { counts[s.city] = (counts[s.city] || 0) + 1; });
+  const items = [{ k: 'all', label: '全部', n: STORES.length, color: null }]
+    .concat(CITY_ORDER.filter((c) => counts[c]).map((c) => ({ k: c, label: c.replace('市', ''), n: counts[c], color: CITY_COLORS[c] })));
+  $('#chips').innerHTML = items.map((it) => '<div class="chip ' + (state.city === it.k ? 'on' : '') + '" data-city="' + it.k + '">' +
+    (it.color ? '<i style="background:' + (state.city === it.k ? '#fff' : it.color) + '"></i>' : '') +
+    it.label + '<span class="n">' + it.n + '</span></div>').join('');
+  document.querySelectorAll('#chips .chip').forEach((el) => {
+    el.onclick = () => {
+      state.city = el.dataset.city;
+      state.district = 'all';
+      renderChips(); renderStats(); renderList(); flyTo(); renderMarkers(); renderLegend(); syncRings(view());
+    };
+  });
+
+  renderDistrictChips();
+}
+
+/* 区县模式下才出现的第二级筛选 */
+function renderDistrictChips() {
+  const box = $('#dchips');
+  if (state.mode !== 'district') { box.style.display = 'none'; return; }
+
+  const pool = STORES.filter((s) => state.city === 'all' || s.city === state.city);
+  const cnt = {};
+  pool.forEach((s) => { cnt[s.district] = (cnt[s.district] || 0) + 1; });
+  const list = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+
+  // 当前选中项若已不在候选里（换了城市），回落为全部
+  if (state.district !== 'all' && !cnt[state.district]) state.district = 'all';
+
+  box.style.display = 'flex';
+  box.innerHTML =
+    '<div class="chip all-mark ' + (state.district === 'all' ? 'on' : '') + '" data-d="all">全部区县<span class="n">' + pool.length + '</span></div>' +
+    list.map(([d, n]) => '<div class="chip ' + (state.district === d ? 'on' : '') + '" data-d="' + esc(d) + '">' +
+      '<i style="background:' + (DISTRICT_COLOR[districtKey(pool.find((s) => s.district === d))] || '#8A7E77') + '"></i>' +
+      esc(d) + '<span class="n">' + n + '</span></div>').join('');
+
+  box.querySelectorAll('.chip').forEach((el) => {
+    el.onclick = () => {
+      state.district = el.dataset.d;
+      renderDistrictChips(); renderStats(); renderList(); flyTo(); renderMarkers(); syncRings(view());
+    };
+  });
+}
+
+/* ============ 图例（随模式变化） ============ */
+function renderLegend() {
+  const rows = view();
+  if (state.mode === 'heat') {
+    $('#legend').innerHTML = '<div class="lg-h">门店密度</div><div class="bar"></div>' +
+      '<div class="bl"><span>稀疏</span><span>密集</span></div>' +
+      '<div class="more">' + rows.length + ' 个点参与计算</div>';
+    return;
+  }
+  if (state.mode === 'district') {
+    const cnt = {};
+    rows.forEach((s) => { const k = districtKey(s); cnt[k] = (cnt[k] || 0) + 1; });
+    const list = Object.entries(cnt).sort((a, b) => b[1] - a[1]);
+    $('#legend').innerHTML = '<div class="lg-h">区县 · 共 ' + list.length + ' 个（可点选）</div>' +
+      list.slice(0, 10).map(([k, n]) => '<div class="row" data-d="' + esc(k.split('/')[1]) + '" style="cursor:pointer">' +
+        '<i style="background:' + DISTRICT_COLOR[k] + '"></i>' + esc(k.split('/')[1]) + '<span>' + n + '</span></div>').join('') +
+      (list.length > 10 ? '<div class="more">其余 ' + (list.length - 10) + ' 个区县略</div>' : '');
+    document.querySelectorAll('#legend .row[data-d]').forEach((el) => {
+      el.onclick = () => {
+        state.district = state.district === el.dataset.d ? 'all' : el.dataset.d;
+        renderDistrictChips(); renderStats(); renderList(); flyTo(); renderMarkers(); renderLegend(); syncRings(view());
+      };
+    });
+    return;
+  }
+  const cnt = {};
+  rows.forEach((s) => { cnt[s.city] = (cnt[s.city] || 0) + 1; });
+  $('#legend').innerHTML = '<div class="lg-h">城市</div>' +
+    CITY_ORDER.filter((c) => cnt[c]).map((c) => '<div class="row"><i style="background:' + CITY_COLORS[c] + '"></i>' +
+      c + '<span>' + cnt[c] + '</span></div>').join('');
+}
+
+/* ============ 提示 ============ */
+function renderTip() {
+  const t = state.mode === 'heat'
+    ? '越<b>红</b>代表门店越密集 · 点左侧列表可定位单店'
+    : state.mode === 'district'
+      ? '颜色对应<b>区县</b>，缩放至市级以下自动拆分 · 点圆点看详情'
+      : '点击圆点查看详情 · 缩放至市级以下自动聚合，避免重叠';
+  $('#tip').innerHTML = t;
+}
+
+/* ============ 列表 ============ */
+function renderList() {
+  const rows = view();
+  if (!rows.length) { $('#list').innerHTML = '<div class="empty">没有匹配的门店</div>'; return; }
+  $('#list').innerHTML = rows.map((s) => {
+    const tag = s.district || s.city.replace('市', '');
+    return '<div class="item ' + (state.sel === s.id ? 'on' : '') + '" data-id="' + s.id + '">' +
+      '<div class="row1"><span class="city" style="background:' + colorOf(s) + '">' + esc(tag) + '</span>' +
+      '<span class="nm">' + esc(s.name) + '</span><span class="cd">' + esc(s.code) + '</span></div>' +
+      '<div class="ad">' + esc(s.addr) + '</div>' +
+      '<div class="mt"><span>' + esc(s.open) + '</span><span>' + esc(s.tel) + '</span></div></div>';
+  }).join('');
+  document.querySelectorAll('#list .item').forEach((el) => {
+    el.onclick = () => select(Number(el.dataset.id));
+  });
+}
+
+/* ============ 图标 ============ */
+function iconUrl(color, size, label) {
+  const svg = label
+    ? '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
+      '<circle cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + (size / 2 - 2) + '" fill="' + color + '" fill-opacity=".92" stroke="#fff" stroke-width="2.5"/>' +
+      '<text x="50%" y="50%" dy=".35em" text-anchor="middle" font-family="system-ui,sans-serif" font-size="' + (size * 0.4) + '" font-weight="700" fill="#fff">' + label + '</text></svg>'
+    : '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '">' +
+      '<circle cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + (size / 2 - 2) + '" fill="' + color + '" stroke="#fff" stroke-width="2.5"/></svg>';
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+
+/* ============ 热力层 ============ */
+function updateHeat(rows) {
+  const data = rows.map((s) => ({ lat: s.lat, lng: s.lng, count: 1 }));
+  if (!heatLayer) {
+    heatLayer = new TMap.visualization.Heat({
+      radius: 30,
+      height: 30,
+      gradientColor: { 0: '#F7E7CE', 0.45: '#F0B357', 0.75: '#DE7A3A', 1: '#B7242C' },
+    }).addTo(map);
+  }
+  heatLayer.setData(data);
+}
+function removeHeat() {
+  if (!heatLayer) return;
+  try { heatLayer.remove(); } catch (e) { try { heatLayer.setMap(null); } catch (e2) {} }
+  heatLayer = null;
+}
+
+/* ============ 覆盖圈 / 内部空洞 ============ */
+const K_LAT = 110540, K_LNG = 111320;
+function distM(lng1, lat1, lng2, lat2) {
+  const dx = (lng2 - lng1) * K_LNG * Math.cos((lat1 + lat2) / 2 * Math.PI / 180);
+  const dy = (lat2 - lat1) * K_LAT;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+let NN = null;
+function nnStats() {
+  if (NN) return NN;
+  let lone = 0, crowded = 0;
+  STORES.forEach((s) => {
+    let m = Infinity;
+    for (const o of STORES) {
+      if (o.id === s.id) continue;
+      const d = distM(s.lng, s.lat, o.lng, o.lat);
+      if (d < m) m = d;
+    }
+    if (m > 5000) lone++;
+    else if (m < 300) crowded++;
+  });
+  NN = { lone: lone, crowded: crowded };
+  return NN;
+}
+function convexHull(pts) {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lower = [];
+  for (const q of p) {
+    while (lower.length >= 2 && cross(lower[lower.length - 2], lower[lower.length - 1], q) <= 0) lower.pop();
+    lower.push(q);
+  }
+  const upper = [];
+  for (let i = p.length - 1; i >= 0; i--) {
+    const q = p[i];
+    while (upper.length >= 2 && cross(upper[upper.length - 2], upper[upper.length - 1], q) <= 0) upper.pop();
+    upper.push(q);
+  }
+  lower.pop(); upper.pop();
+  return lower.concat(upper);
+}
+function inPoly(x, y, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+    if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) inside = !inside;
+  }
+  return inside;
+}
+let GAPS = null;
+function computeGaps() {
+  if (GAPS) return GAPS;
+  const hull = convexHull(STORES.map((s) => [s.lng, s.lat]));
+  const lngs = STORES.map((s) => s.lng), lats = STORES.map((s) => s.lat);
+  const step = 0.02;
+  const cells = {};
+  let inside = 0;
+  for (let lng = Math.min.apply(null, lngs); lng < Math.max.apply(null, lngs); lng += step) {
+    for (let lat = Math.min.apply(null, lats); lat < Math.max.apply(null, lats); lat += step) {
+      const cx = lng + step / 2, cy = lat + step / 2;
+      if (!inPoly(cx, cy, hull)) continue;
+      inside++;
+      let m = Infinity;
+      for (const s of STORES) {
+        const d = distM(cx, cy, s.lng, s.lat);
+        if (d < m) m = d;
+      }
+      if (m > 5000) cells[Math.round(lng / step) + '_' + Math.round(lat / step)] = { lng: cx, lat: cy };
+    }
+  }
+  const seen = {}, blobs = [];
+  Object.keys(cells).forEach((k) => {
+    if (seen[k]) return;
+    const stack = [k], group = [];
+    seen[k] = 1;
+    while (stack.length) {
+      const cur = stack.pop();
+      group.push(cells[cur]);
+      const gp = cur.split('_');
+      const gx = +gp[0], gy = +gp[1];
+      const nb = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+      for (let i = 0; i < nb.length; i++) {
+        const nk = (gx + nb[i][0]) + '_' + (gy + nb[i][1]);
+        if (cells[nk] && !seen[nk]) { seen[nk] = 1; stack.push(nk); }
+      }
+    }
+    blobs.push(group);
+  });
+  const cellKm2 = (step * K_LNG * Math.cos(22.5 * Math.PI / 180) / 1000) * (step * K_LAT / 1000);
+  const gapCells = Object.keys(cells).length;
+  GAPS = {
+    blobs: blobs.map((g) => ({
+      lng: g.reduce((a, c) => a + c.lng, 0) / g.length,
+      lat: g.reduce((a, c) => a + c.lat, 0) / g.length,
+      area: g.length * cellKm2,
+    })).sort((a, b) => b.area - a.area),
+    rate: inside ? 1 - gapCells / inside : 0,
+  };
+  return GAPS;
+}
+
+let ringLayer = null, gapLayer = null;
+function syncRings(rows) {
+  if (!map || !window.TMap) return;
+  if (ringLayer) { ringLayer.setMap(null); ringLayer = null; }
+  if (gapLayer) { gapLayer.setMap(null); gapLayer = null; }
+  if (!state.ring) return;
+
+  ringLayer = new TMap.MultiCircle({
+    map: map,
+    zIndex: 4,
+    styles: {
+      r: new TMap.CircleStyle({
+        color: 'rgba(183,36,44,0.055)', showBorder: true,
+        borderColor: 'rgba(183,36,44,0.20)', borderWidth: 1,
+      }),
+    },
+    geometries: rows.map((s) => ({
+      id: 'r' + s.id, styleId: 'r', center: new TMap.LatLng(s.lat, s.lng), radius: 5000,
+    })),
+  });
+
+  const g = computeGaps();
+  if (g.blobs.length) {
+    gapLayer = new TMap.MultiCircle({
+      map: map,
+      zIndex: 5,
+      styles: {
+        g: new TMap.CircleStyle({
+          color: 'rgba(90,80,72,0.05)', showBorder: true,
+          borderColor: 'rgba(120,110,100,0.45)', borderWidth: 1.5,
+        }),
+      },
+      geometries: g.blobs.map((b, i) => ({
+        id: 'g' + i, styleId: 'g',
+        center: new TMap.LatLng(b.lat, b.lng),
+        radius: Math.sqrt(b.area * 1e6 / Math.PI),
+      })),
+    });
+  }
+}
+
+function updateRingSum() {
+  const box = $('#ringsum');
+  if (!state.ring) { box.style.display = 'none'; return; }
+  const g = computeGaps();
+  const st = nnStats();
+  const area = g.blobs.reduce((a, b) => a + b.area, 0);
+  box.style.display = 'block';
+  box.innerHTML = '5km 覆盖格占凸包 <b>' + Math.round(g.rate * 100) + '%</b> · 内部空洞 <b>' + g.blobs.length +
+    '</b> 处（约 ' + Math.round(area) + ' km²）<br>孤岛店（5km 无邻店）<b>' + st.lone +
+    '</b> 家 · 300m 内成对有 <b>' + st.crowded + '</b> 家' +
+    '<div class="cf">空洞含山体、水道等非居住区，仅反映网点形态</div>';
+}
+
+let ringTimer = null;
+function scheduleRings() {
+  clearTimeout(ringTimer);
+  ringTimer = setTimeout(() => syncRings(view()), 300);
+}
+
+/* ============ 标记 ============ */
+function renderMarkers() {
+  if (!map || !window.TMap) return;
+  const rows = view();
+
+  if (markerLayer) { markerLayer.setMap(null); markerLayer = null; }
+
+  if (state.mode === 'heat') { updateHeat(rows); return; }
+  removeHeat();
+
+  const doCluster = state.zoom < 10.5 && rows.length > 80;
+  clustered = doCluster;
+
+  const styles = {};
+  const geoms = [];
+
+  if (doCluster) {
+    const cell = state.zoom < 9 ? 0.35 : state.zoom < 10 ? 0.18 : 0.09;
+    const grid = {};
+    rows.forEach((s) => {
+      const k = Math.round(s.lng / cell) + '_' + Math.round(s.lat / cell);
+      if (!grid[k]) grid[k] = { lng: 0, lat: 0, n: 0, ids: [], pal: {} };
+      const g = grid[k];
+      g.lng += s.lng; g.lat += s.lat; g.n++; g.ids.push(s.id);
+      const c = colorOf(s);
+      g.pal[c] = (g.pal[c] || 0) + 1;
+    });
+    Object.entries(grid).forEach(([k, g], i) => {
+      const color = Object.entries(g.pal).sort((a, b) => b[1] - a[1])[0][0];
+      const size = g.n >= 40 ? 46 : g.n >= 15 ? 40 : 32;
+      const sid = 'c' + i;
+      styles[sid] = new TMap.MarkerStyle({ width: size, height: size, anchor: { x: size / 2, y: size / 2 }, src: iconUrl(color, size, g.n) });
+      geoms.push({ id: 'k' + k, styleId: sid, position: new TMap.LatLng(g.lat / g.n, g.lng / g.n), properties: { cluster: g.ids } });
+    });
+  } else {
+    rows.forEach((s) => {
+      const c = colorOf(s);
+      if (!styles[c]) styles[c] = new TMap.MarkerStyle({ width: 15, height: 15, anchor: { x: 7.5, y: 7.5 }, src: iconUrl(c, 15) });
+      const on = c + '|on';
+      if (!styles[on]) styles[on] = new TMap.MarkerStyle({ width: 24, height: 24, anchor: { x: 12, y: 12 }, src: iconUrl(c, 24) });
+    });
+    rows.forEach((s) => {
+      const c = colorOf(s);
+      geoms.push({
+        id: String(s.id),
+        styleId: state.sel === s.id ? c + '|on' : c,
+        position: new TMap.LatLng(s.lat, s.lng),
+        properties: { store: s.id },
+      });
+    });
+  }
+
+  markerLayer = new TMap.MultiMarker({ map: map, styles: styles, geometries: geoms, zIndex: 10 });
+  markerLayer.on('click', (evt) => {
+    const p = (evt.geometry && evt.geometry.properties) || {};
+    if (p.cluster) {
+      const ids = p.cluster;
+      const sum = ids.reduce((a, id) => {
+        const s = STORES.find((x) => x.id === id);
+        return [a[0] + s.lng, a[1] + s.lat];
+      }, [0, 0]);
+      map.setCenter(new TMap.LatLng(sum[1] / ids.length, sum[0] / ids.length));
+      map.setZoom(Math.min(13, state.zoom + 2));
+      return;
+    }
+    if (p.store) select(p.store);
+  });
+}
+
+/* ============ 选中 ============ */
+function select(id) {
+  const s = STORES.find((x) => x.id === id);
+  if (!s) return;
+  if (state.city !== 'all' && s.city !== state.city) { state.city = 'all'; renderChips(); }
+  state.sel = id;
+  renderStats(); renderList();
+  if (state.mode !== 'heat') renderMarkers();
+
+  const el = document.querySelector('.item[data-id="' + id + '"]');
+  if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  map.setCenter(new TMap.LatLng(s.lat, s.lng));
+  if (state.zoom < 13) map.setZoom(14);
+
+  infoWindow.setContent(
+    '<div class="iw"><h4><span class="tag" style="background:' + CITY_COLORS[s.city] + '">' +
+    esc(s.district || s.city.replace('市', '')) + '</span>' + esc(s.name) + '</h4>' +
+    '<p>' + esc(s.addr) + '</p><div class="kv">' +
+    '<b>城市</b><span>' + esc(s.city) + '</span>' +
+    '<b>编号</b><span>' + esc(s.code) + '</span>' +
+    '<b>电话</b><span>' + esc(s.tel) + '</span>' +
+    '<b>营业</b><span>' + esc(s.open) + '</span>' +
+    '<b>坐标</b><span>' + s.lng.toFixed(5) + ', ' + s.lat.toFixed(5) + '</span>' +
+    '</div></div>');
+  infoWindow.setPosition(new TMap.LatLng(s.lat, s.lng));
+  infoWindow.open();
+}
+
+/* ============ 视野 ============ */
+function flyTo() {
+  const rows = view();
+  if (!rows.length) return;
+  const lngs = rows.map((r) => r.lng), lats = rows.map((r) => r.lat);
+  const cLng = (Math.min.apply(null, lngs) + Math.max.apply(null, lngs)) / 2;
+  const cLat = (Math.min.apply(null, lats) + Math.max.apply(null, lats)) / 2;
+  const span = Math.max(
+    Math.max.apply(null, lngs) - Math.min.apply(null, lngs),
+    (Math.max.apply(null, lats) - Math.min.apply(null, lats)) * 1.35
+  );
+  const zoom = span > 1.6 ? 9.4 : span > 1.0 ? 10 : span > 0.55 ? 10.7 : span > 0.3 ? 11.5 : span > 0.15 ? 12.3 : 13;
+  map.setCenter(new TMap.LatLng(cLat, cLng));
+  map.setZoom(zoom);
+  state.zoom = zoom;
+  lastRenderZoom = zoom;
+}
+
+/* ============ 底图详略 ============ */
+function baseMapOpt() {
+  const f = BASE_FEATURES[state.base];
+  return f ? { type: 'vector', features: f } : { type: 'vector' };
+}
+function applyBase() {
+  if (!map || !window.TMap) return;
+  try { map.setBaseMap(baseMapOpt()); } catch (e) {}
+}
+function renderBase() {
+  const box = $('#base');
+  if (!box) return;
+  box.querySelectorAll('button').forEach((b) => {
+    b.classList.toggle('on', b.dataset.b === state.base);
+  });
+  try { localStorage.setItem('cdx-base', state.base); } catch (e) {}
+}
+
+/* 旋转控件容器没有类名可定位，靠子元素反查并隐藏到 #map 的直接子层
+   （CSS :has() 已处理新内核，这里兜底旧版安卓 WebView） */
+function hideRotateControl() {
+  let tries = 0;
+  const tick = () => {
+    const el = document.querySelector('#map [class*="rotate-left"]');
+    if (!el) return false;
+    const mapEl = document.getElementById('map');
+    let node = el;
+    while (node.parentElement && node.parentElement !== mapEl) node = node.parentElement;
+    if (node !== el) node.style.display = 'none';
+    return true;
+  };
+  if (tick()) return;
+  const timer = setInterval(() => {
+    if (tick() || ++tries > 20) clearInterval(timer);
+  }, 300);
+}
+
+/* ============ 初始化 ============ */
+function initMap() {
+  const lng = STORES.reduce((a, s) => a + s.lng, 0) / STORES.length;
+  const lat = STORES.reduce((a, s) => a + s.lat, 0) / STORES.length;
+
+  map = new TMap.Map('map', {
+    center: new TMap.LatLng(lat, lng),
+    zoom: 9,
+    viewMode: '2D',
+    showControl: true,
+    pitch: 0,
+    rotation: 0,
+  });
+
+  infoWindow = new TMap.InfoWindow({
+    map: map,
+    position: new TMap.LatLng(lat, lng),
+    content: '',
+    offset: { x: 0, y: -16 },
+    enableCustom: true,
+  });
+  infoWindow.close();
+
+  // 缩放联动：轮询判断，跨过聚合阈值或缩放变化较大时重绘
+  setInterval(() => {
+    if (!map || state.mode === 'heat') return;
+    const z = map.getZoom();
+    if (Math.abs(z - lastRenderZoom) < 0.01) return;
+    const crossed = (lastRenderZoom < 10.5) !== (z < 10.5);
+    state.zoom = z;
+    if (crossed || (z < 10.5 && Math.abs(z - lastRenderZoom) >= 0.7)) {
+      lastRenderZoom = z;
+      renderMarkers();
+    }
+  }, 350);
+
+  renderModes(); renderChips(); renderStats(); renderList();
+  flyTo(); renderMarkers(); renderLegend(); renderTip();
+  renderBase(); applyBase(); hideRotateControl();
+}
+
+/* 深色 / 浅色 */
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  const btn = $('#theme');
+  if (btn) btn.textContent = t === 'dark' ? '☀' : '☾';
+  try { localStorage.setItem('cdx-theme', t); } catch (e) {}
+}
+(function initTheme() {
+  let t = null;
+  try { t = localStorage.getItem('cdx-theme'); } catch (e) {}
+  if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  applyTheme(t);
+})();
+$('#theme').onclick = () => {
+  const cur = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  applyTheme(cur === 'dark' ? 'light' : 'dark');
+};
+
+/* 底图详略 */
+document.querySelectorAll('#base button').forEach((b) => {
+  b.onclick = () => {
+    if (state.base === b.dataset.b) return;
+    state.base = b.dataset.b;
+    renderBase();
+    applyBase();
+  };
+});
+
+/* 移动端图例折叠（桌面端按钮不显示，图例始终展开） */
+(function () {
+  const btn = document.getElementById('legendBtn');
+  const lg = document.getElementById('legend');
+  if (!btn || !lg) return;
+  btn.onclick = () => {
+    const open = lg.classList.toggle('open');
+    btn.textContent = open ? '收起' : '图例';
+  };
+})();
+
+/* 覆盖圈开关 */
+$('#ring').addEventListener('change', (e) => {
+  state.ring = e.target.checked;
+  syncRings(view());
+  updateRingSum();
+});
+
+/* 搜索 */
+$('#q').addEventListener('input', (e) => {
+  state.q = e.target.value.trim();
+  $('#qx').style.display = state.q ? 'block' : 'none';
+  renderStats(); renderList(); renderMarkers(); renderLegend(); scheduleRings();
+});
+$('#qx').onclick = () => {
+  $('#q').value = ''; state.q = ''; $('#qx').style.display = 'none';
+  renderStats(); renderList(); renderMarkers(); renderLegend(); scheduleRings();
+};
+
+/* 底图加载失败时给出明确说明，避免只看到一个空白矩形 */
+function mapFallback(msg) {
+  const el = document.getElementById('map');
+  if (!el || el.dataset.failed) return;
+  el.dataset.failed = '1';
+  const d = document.createElement('div');
+  d.className = 'map-fallback';
+  d.innerHTML = '<b>底图未能加载</b><span>' + msg + '</span>' +
+    '<span class="hint">左侧的门店列表、筛选与统计仍可正常使用</span>';
+  el.appendChild(d);
+}
+
+/* 启动：SDK 未就绪时不要静默失败 */
+(function boot() {
+  let started = false;
+  const start = () => {
+    if (started || !window.TMap) return;
+    started = true;
+    try { initMap(); } catch (e) {
+      mapFallback('地图初始化出错：' + (e && e.message ? e.message : e));
+    }
+  };
+  if (window.TMap) start();
+  else window.addEventListener('load', start);
+  setTimeout(() => {
+    if (!started) mapFallback('地图服务没有响应，可能是网络受限或底图密钥未生效。');
+  }, 9000);
+})();
+</script>
+</body>
+</html>

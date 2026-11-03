@@ -1,0 +1,8 @@
+{
+  "base": "https://v.ystpay.cn/dj-mini",
+  "headers": {
+    "merch": "2406145900603",
+    "BusinessType": "D",
+    "Content-Type": "application/json"
+  }
+}

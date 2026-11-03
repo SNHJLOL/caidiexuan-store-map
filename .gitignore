@@ -1,0 +1,19 @@
+# WorkBuddy 内部文件
+.workbuddy/
+*.genie
+
+# 上传脚本（临时）
+_gh_*.js
+
+# 构建产物（微信小程序打包输出）
+out/
+
+# 密钥（腾讯地图 API Key 等，切勿提交）
+tools/.tmap-key
+
+# 临时日志与备份
+*.log
+*.bak.json
+
+# 系统文件
+.DS_Store
